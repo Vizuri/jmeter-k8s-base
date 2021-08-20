@@ -1,4 +1,5 @@
-FROM openjdk:14-slim
+FROM registry.access.redhat.com/ubi8/openjdk-11:1.10-1
+#FROM openjdk:14-slim
 		
 ARG JMETER_VERSION=5.4.1
 ARG JMETER_INSTALLATION_PATH="/opt/jmeter/apache-jmeter-${JMETER_VERSION}" 
@@ -9,9 +10,12 @@ ARG JMETER_PLUGIN_URL="https://jmeter-plugins.org/get/"
 ARG JMETER_PLUGIN_PATH="${JMETER_INSTALLATION_PATH}/lib/ext/jmeter-plugin-manager.jar"
 
 ## Installing dependencies
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y wget coreutils unzip bash curl
+#RUN apt-get update && \
+#    apt-get upgrade -y && \
+#    apt-get install -y wget coreutils unzip bash curl
+USER root
+RUN microdnf install -y wget gzip unzip bash curl
+USER jboss
 
 # Installing jmeter clean and link
 RUN mkdir /opt/jmeter && \
@@ -40,14 +44,15 @@ RUN curl ${CURL_OPTS} --location --output "${JMETER_PLUGIN_PATH}" "${JMETER_PLUG
 RUN curl ${CURL_OPTS} --location --output "${JMETER_INSTALLATION_PATH}/lib/jolokia-java-agent.jar"  "https://search.maven.org/remotecontent?filepath=org/jolokia/jolokia-jvm/1.6.2/jolokia-jvm-1.6.2-agent.jar"
 
 ## Setting users &&  directory and right
-RUN mkdir /report &&  \
-    addgroup jmeter && \
-    adduser --disabled-password --gecos '' --home /jmeter --ingroup jmeter jmeter && \
-    chown --recursive jmeter:jmeter /opt/jmeter && \
-    chown --recursive jmeter:jmeter /report
+#RUN mkdir /report &&  \
+#    addgroup jmeter && \
+#    adduser --disabled-password --gecos '' --home /jmeter --ingroup jmeter jmeter && \
+#    chown --recursive jmeter:jmeter /opt/jmeter && \
+#    chown --recursive jmeter:jmeter /report
 
 ENV JMETER_HOME ${JMETER_INSTALLATION_PATH}
 
 ENV PATH $JMETER_HOME/bin:$PATH
 
-USER jmeter
+#USER jmeter
+#USER jboss
