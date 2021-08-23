@@ -15,7 +15,7 @@ ARG JMETER_PLUGIN_PATH="${JMETER_INSTALLATION_PATH}/lib/ext/jmeter-plugin-manage
 #    apt-get install -y wget coreutils unzip bash curl
 USER root
 RUN microdnf install -y wget gzip unzip bash curl
-USER jboss
+
 
 # Installing jmeter clean and link
 RUN mkdir /opt/jmeter && \
@@ -50,9 +50,17 @@ RUN curl ${CURL_OPTS} --location --output "${JMETER_INSTALLATION_PATH}/lib/jolok
 #    chown --recursive jmeter:jmeter /opt/jmeter && \
 #    chown --recursive jmeter:jmeter /report
 
+
 ENV JMETER_HOME ${JMETER_INSTALLATION_PATH}
 
 ENV PATH $JMETER_HOME/bin:$PATH
+
+RUN mkdir /report && \
+    chmod 777 /report && \
+    chmod -R 777 /opt/jmeter && \
+    chown --recursive jboss:root /opt/jmeter && \
+    chown --recursive jboss:root /report
+USER jboss
 
 #USER jmeter
 #USER jboss
